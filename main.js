@@ -1086,7 +1086,19 @@ canvas.addEventListener("click", () => {
   if (stage === "main" && !controls.isLocked && !anyOverlayOpen()) controls.lock();
 });
 
-cvEnterBtn?.addEventListener("click", beginCvTransition);
+const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Opera Mini/i.test(navigator.userAgent)
+  || (navigator.maxTouchPoints > 1 && !window.matchMedia("(pointer:fine)").matches);
+
+if (isMobile && cvEnterBtn) {
+  cvEnterBtn.disabled = true;
+  cvEnterBtn.textContent = "Desktop Only";
+  cvEnterBtn.style.opacity = "0.45";
+  cvEnterBtn.style.cursor = "not-allowed";
+  const hint = document.querySelector(".cv-hint");
+  if (hint) hint.textContent = "Open on a computer to explore the interactive version.";
+} else {
+  cvEnterBtn?.addEventListener("click", beginCvTransition);
+}
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
