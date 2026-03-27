@@ -214,34 +214,6 @@ export const WORLD_OBJECTS = [
   },
 
   {
-    id: "experience",
-    name: "Experience",
-    category: "cv",
-    type: "geometry",
-    shape: "cube",
-    color: 0xffc28a,
-    position: { x: -40, z: 30 },
-    yOffset: 1.5,
-    placeOnTerrain: true,
-    discoverable: true,
-    revealRadius: 20,
-    interaction: "panel",
-    content: {
-      title: "Experience",
-      writing:
-        "I enjoy building systems that are useful in real settings, from national-scale healthcare workflows to high-stakes research environments.",
-      bodyHtml: `
-        <h2>Experience</h2>
-        <ul>
-          <li><strong>Research Scientist, Semmelweis University (2023):</strong> managed multi-hospital oncology data for national AI mammography screening program</li>
-          <li><strong>Research Scientist, IDF (2020):</strong> national security projects using statistical physics, signal processing, deep learning</li>
-          <li><strong>Project Manager, ARDC (2018):</strong> launched coding boot-camp initiative for refugees</li>
-        </ul>
-      `,
-    },
-  },
-
-  {
     id: "awards",
     name: "Awards",
     category: "cv",
