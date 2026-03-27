@@ -1,0 +1,2435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0; url=./play.html" />
+    <title>Redirecting...</title>
+    <script>
+      window.location.replace("./play.html");
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to <a href="./play.html">play.html</a> ...</p>
+  </body>
+</html>
+ok
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escape the Labyrinth of Cancer | Portfolio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="bg"></canvas>
+
+    <div id="boot-overlay" class="overlay visible">
+      <div class="boot-card">
+        <p class="eyebrow">Containment Protocol v1.0</p>
+        <h1>Escape the Labyrinth of Cancer</h1>
+        <p>
+          A 3D research facility where each solved mechanism reveals a new
+          layer of my work in cancer systems biology.
+        </p>
+        <button id="enter-btn">Enter Facility</button>
+        <p class="hint">
+          Controls: <strong>WASD</strong> move, <strong>mouse</strong> look,
+          <strong>E</strong> interact, <strong>N</strong> quick navigation
+        </p>
+      </div>
+    </div>
+
+    <div id="hud">
+      <div class="hud-left">
+        <p class="hud-label">Current Objective</p>
+        <p id="objective">Initialize the facility.</p>
+      </div>
+      <div class="hud-right">
+        <p id="room-name">Room: Airlock</p>
+        <p id="progress">Progress: 0 / 6</p>
+      </div>
+    </div>
+
+    <div id="crosshair"></div>
+    <div id="interaction-tip">Press E to interact</div>
+
+    <div id="content-panel" class="panel hidden">
+      <button id="close-panel" aria-label="Close panel">X</button>
+      <div id="panel-body"></div>
+    </div>
+
+    <div id="nav-panel" class="panel hidden">
+      <button id="close-nav" aria-label="Close nav">X</button>
+      <h2>Facility Navigation</h2>
+      <p>
+        Skip puzzle friction if needed. This keeps key info always accessible.
+      </p>
+      <div id="nav-buttons"></div>
+      <button id="unlock-all-btn" class="secondary">
+        Unlock All Rooms (Accessibility)
+      </button>
+    </div>
+
+    <div id="toast"></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escape the Labyrinth of Cancer | Portfolio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="bg"></canvas>
+
+    <div id="boot-overlay" class="overlay visible">
+      <div class="boot-card">
+        <p class="eyebrow">Containment Protocol v1.0</p>
+        <h1>Escape the Labyrinth of Cancer</h1>
+        <p>
+          A 3D research facility where each solved mechanism reveals a new
+          layer of my work in cancer systems biology.
+        </p>
+        <button id="enter-btn">Enter Facility</button>
+        <p class="hint">
+          Controls: <strong>WASD</strong> move, <strong>mouse</strong> look,
+          <strong>E</strong> interact, <strong>N</strong> quick navigation
+        </p>
+      </div>
+    </div>
+
+    <div id="hud">
+      <div class="hud-left">
+        <p class="hud-label">Current Objective</p>
+        <p id="objective">Initialize the facility.</p>
+      </div>
+      <div class="hud-right">
+        <p id="room-name">Room: Airlock</p>
+        <p id="progress">Progress: 0 / 6</p>
+      </div>
+    </div>
+
+    <div id="crosshair"></div>
+
+    <div id="interaction-tip">Press E to interact</div>
+
+    <div id="content-panel" class="panel hidden">
+      <button id="close-panel" aria-label="Close panel">X</button>
+      <div id="panel-body"></div>
+    </div>
+
+    <div id="nav-panel" class="panel hidden">
+      <button id="close-nav" aria-label="Close nav">X</button>
+      <h2>Facility Navigation</h2>
+      <p>
+        Skip puzzle friction if needed. This keeps key info always accessible.
+      </p>
+      <div id="nav-buttons"></div>
+      <button id="unlock-all-btn" class="secondary">
+        Unlock All Rooms (Accessibility)
+      </button>
+    </div>
+
+    <div id="toast"></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escape the Labyrinth of Cancer</title>
+  <style>
+    :root {
+      --bg: #03070d;
+      --panel: rgba(4, 10, 22, 0.72);
+      --panel-border: rgba(109, 176, 255, 0.45);
+      --text: #dce8ff;
+      --muted: #9bb4d9;
+      --accent: #70d9ff;
+      --accent-2: #a57bff;
+      --warn: #ffd46d;
+      --success: #8fffc3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 15% 10%, #101827 0%, var(--bg) 40%, #000 100%);
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+    }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .reticle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(203, 234, 255, 0.8);
+      border-radius: 50%;
+      opacity: 0.95;
+    }
+
+    .reticle::before,
+    .reticle::after {
+      content: "";
+      position: absolute;
+      background: rgba(203, 234, 255, 0.75);
+    }
+
+    .reticle::before {
+      left: 50%;
+      top: 4px;
+      width: 1px;
+      height: 10px;
+      transform: translateX(-50%);
+    }
+
+    .reticle::after {
+      top: 50%;
+      left: 4px;
+      width: 10px;
+      height: 1px;
+      transform: translateY(-50%);
+    }
+
+    #topbar {
+      pointer-events: auto;
+      position: absolute;
+      left: 18px;
+      top: 16px;
+      right: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      box-shadow: 0 0 22px rgba(77, 126, 193, 0.32);
+    }
+
+    #statusBox {
+      padding: 10px 12px;
+      max-width: 640px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    #quickNav {
+      pointer-events: auto;
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: 820px;
+    }
+
+    button, .linkButton {
+      background: rgba(17, 35, 62, 0.72);
+      color: var(--text);
+      border: 1px solid rgba(120, 167, 244, 0.45);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:hover, .linkButton:hover {
+      background: rgba(23, 47, 82, 0.95);
+      border-color: rgba(176, 211, 255, 0.72);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #modeBox {
+      pointer-events: auto;
+      padding: 10px 12px;
+      min-width: 220px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    #overlay {
+      pointer-events: auto;
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: linear-gradient(to bottom, rgba(3, 7, 14, 0.72), rgba(1, 2, 7, 0.85));
+    }
+
+    .card {
+      width: min(820px, 92vw);
+      max-height: 86vh;
+      overflow: auto;
+      padding: 20px;
+      border-radius: 14px;
+      background: rgba(3, 9, 21, 0.92);
+      border: 1px solid rgba(124, 182, 255, 0.45);
+      box-shadow: 0 0 34px rgba(55, 111, 182, 0.38);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px 0;
+      letter-spacing: 0.2px;
+    }
+
+    h1 {
+      font-size: clamp(22px, 3vw, 34px);
+      color: #f1f7ff;
+    }
+
+    h2 {
+      font-size: clamp(18px, 2.1vw, 24px);
+      color: #dcedff;
+    }
+
+    p, li {
+      color: #cadeff;
+      font-size: 15px;
+      line-height: 1.56;
+    }
+
+    ul {
+      margin-top: 6px;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hint {
+      color: var(--warn);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .success {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+
+    .contentBlock {
+      margin-top: 14px;
+      border: 1px solid rgba(121, 181, 255, 0.35);
+      background: rgba(7, 15, 30, 0.65);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .contentBlock h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: #e8f3ff;
+    }
+
+    a {
+      color: #9fd8ff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #toast {
+      pointer-events: none;
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(4, 10, 22, 0.9);
+      border: 1px solid rgba(118, 176, 255, 0.5);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #def0ff;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      max-width: 80vw;
+      text-align: center;
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
+
+    #accessPanel {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(11, 24, 44, 0.7);
+      border: 1px solid rgba(122, 184, 255, 0.3);
+    }
+
+    noscript {
+      display: block;
+      padding: 16px;
+      background: #111;
+      color: #fff;
+      position: fixed;
+      inset: 0;
+      overflow: auto;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div class="reticle" aria-hidden="true"></div>
+    <div id="topbar">
+      <div>
+        <div id="statusBox" class="panel">Initializing research facility...</div>
+        <div id="quickNav"></div>
+      </div>
+      <div id="modeBox" class="panel">
+        <strong>Controls</strong>
+        <div class="row"><span>Move:</span><code>W A S D</code></div>
+        <div class="row"><span>Look:</span><code>Mouse</code></div>
+        <div class="row"><span>Interact:</span><code>Click</code></div>
+        <div class="row"><span>Jump:</span><code>Space</code></div>
+        <div class="row"><span>Pause:</span><code>Esc</code></div>
+        <div class="row">
+          <label><input id="lowMotionToggle" type="checkbox" /> Low motion mode</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="overlay">
+      <div id="overlayCard" class="card"></div>
+    </div>
+    <div id="toast"></div>
+  </div>
+
+  <noscript>
+    <h2>Plain-Text Fallback</h2>
+    <p>This portfolio works best with JavaScript enabled (for 3D interactions).</p>
+    <p><strong>Researcher Focus:</strong> Cancer systems biology, tumor evolution, computational oncology, and translational impact.</p>
+    <p><strong>Sections:</strong> Intro, Research Themes, Methods, Publications, Current Work, Contact.</p>
+    <p><strong>Contact:</strong> Replace with your real email, LinkedIn, GitHub, and Google Scholar links.</p>
+  </noscript>
+
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.1/build/three.module.js";
+    import { PointerLockControls } from "https://unpkg.com/three@0.160.1/examples/jsm/controls/PointerLockControls.js";
+
+    const app = document.getElementById("app");
+    const overlay = document.getElementById("overlay");
+    const overlayCard = document.getElementById("overlayCard");
+    const statusBox = document.getElementById("statusBox");
+    const toast = document.getElementById("toast");
+    const quickNav = document.getElementById("quickNav");
+    const lowMotionToggle = document.getElementById("lowMotionToggle");
+
+    const state = {
+      roomUnlocked: 0,
+      roomVisited: new Set([0]),
+      lowMotion: false,
+      puzzleSolved: [false, false, false, false, false, false],
+      activeModal: "intro",
+      canMove: false
+    };
+
+    const roomData = [
+      {
+        id: "airlock",
+        title: "Room 1 - Airlock / Intro",
+        z: 8,
+        content: `
+          <h3>Who I Am</h3>
+          <p>I study cancer as a systems-level communication problem across molecular, cellular, and clinical scales. I combine experiment, computation, and translational collaboration to uncover mechanisms that can move therapies forward.</p>
+          <p class="subtle">Current role, institution, and brief background can go here.</p>
+        `
+      },
+      {
+        id: "signal",
+        title: "Room 2 - Signal Room",
+        z: -12,
+        content: `
+          <h3>Research Themes</h3>
+          <ul>
+            <li>Tumor evolution and adaptive resistance</li>
+            <li>Immune-cancer ecological interactions</li>
+            <li>Metastatic transition and state attractors</li>
+            <li>Spatial biology and microenvironment architecture</li>
+            <li>Computational oncology and interpretable modeling</li>
+          </ul>
+        `
+      },
+      {
+        id: "instruments",
+        title: "Room 3 - Instrument Bay",
+        z: -32,
+        content: `
+          <h3>Methods and Skills</h3>
+          <div class="grid">
+            <div class="contentBlock"><strong>Wet Lab</strong><br/>Cell culture, perturbation design, immune assays</div>
+            <div class="contentBlock"><strong>Multi-omics</strong><br/>RNA-seq, scRNA, spatial profiling pipelines</div>
+            <div class="contentBlock"><strong>Imaging</strong><br/>Quantitative microscopy and feature extraction</div>
+            <div class="contentBlock"><strong>Computation</strong><br/>Python, R, ML, network modeling, statistics</div>
+          </div>
+        `
+      },
+      {
+        id: "archive",
+        title: "Room 4 - Archive Vault",
+        z: -52,
+        content: `
+          <h3>Publications and Talks</h3>
+          <p>Archive items are grouped by theme rather than year to emphasize coherent scientific questions.</p>
+          <ul>
+            <li><strong>Tumor evolution:</strong> key papers and model frameworks</li>
+            <li><strong>Immune context:</strong> translational and mechanistic studies</li>
+            <li><strong>Spatial systems:</strong> tissue architecture and state inference</li>
+          </ul>
+          <p class="subtle">Replace with your actual publication list and links.</p>
+        `
+      },
+      {
+        id: "evolution",
+        title: "Room 5 - Evolution Chamber",
+        z: -72,
+        content: `
+          <h3>Current Work and Future Directions</h3>
+          <ul>
+            <li>Mapping transition trajectories that precede resistance</li>
+            <li>Building interpretable computational tools for patient-stratified hypotheses</li>
+            <li>Integrating microenvironment constraints into therapy design</li>
+          </ul>
+          <p class="subtle">Open problems, active collaborations, and mission-board updates go here.</p>
+        `
+      },
+      {
+        id: "exit",
+        title: "Room 6 - Exit Console / Contact",
+        z: -92,
+        content: `
+          <h3>Contact and Collaboration</h3>
+          <p>Interested in tumor evolution, translational systems, or computational oncology? Let's connect.</p>
+          <ul>
+            <li>Email: <a href="mailto:you@example.com">you@example.com</a></li>
+            <li>LinkedIn: <a href="#" target="_blank" rel="noreferrer">Add your profile</a></li>
+            <li>GitHub: <a href="#" target="_blank" rel="noreferrer">Add your profile</a></li>
+            <li>Google Scholar: <a href="#" target="_blank" rel="noreferrer">Add your profile</a></li>
+          </ul>
+          <div class="contentBlock">
+            <h3>Behind the Scene</h3>
+            <p>Thank you for visiting my portfolio. If you're curious about the stack and how I built this project, here are the key references.</p>
+            <p><strong>Three.js:</strong> This project uses Three.js to render the 3D world. The ecosystem was started by mr.doob and expanded by a large open-source community, including contributors like Sunag who helped shape TSL and modern rendering workflows.</p>
+            <p><strong>Three.js Journey:</strong> An excellent practical course for learning Three.js from first principles to advanced scenes.</p>
+            <p><a href="https://threejs.org/" target="_blank" rel="noreferrer">https://threejs.org/</a></p>
+          </div>
+        `
+      }
+    ];
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x030711);
+    scene.fog = new THREE.FogExp2(0x02040c, 0.018);
+
+    const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 240);
+    camera.position.set(0, 1.7, 12);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    app.appendChild(renderer.domElement);
+
+    const controls = new PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
+
+    const hemiLight = new THREE.HemisphereLight(0x90d6ff, 0x0a1020, 0.65);
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.PointLight(0x7bd2ff, 1.8, 80, 2);
+    keyLight.position.set(0, 5, -20);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.PointLight(0x8c7fff, 1.2, 70, 2);
+    rimLight.position.set(0, 3, -75);
+    scene.add(rimLight);
+
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0x081222,
+      metalness: 0.45,
+      roughness: 0.35,
+      emissive: 0x020509
+    });
+
+    const wallMat = new THREE.MeshStandardMaterial({
+      color: 0x0c152b,
+      metalness: 0.2,
+      roughness: 0.58,
+      emissive: 0x030a1b
+    });
+
+    const corridorLength = 118;
+    const corridor = new THREE.Group();
+    scene.add(corridor);
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(13, corridorLength), floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set(0, 0, -40);
+    corridor.add(floor);
+
+    const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(13, corridorLength), wallMat);
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.set(0, 5.8, -40);
+    corridor.add(ceiling);
+
+    const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(corridorLength, 5.8), wallMat);
+    leftWall.rotation.y = Math.PI / 2;
+    leftWall.position.set(-6.5, 2.9, -40);
+    corridor.add(leftWall);
+
+    const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(corridorLength, 5.8), wallMat);
+    rightWall.rotation.y = -Math.PI / 2;
+    rightWall.position.set(6.5, 2.9, -40);
+    corridor.add(rightWall);
+
+    const centerLineMat = new THREE.MeshBasicMaterial({ color: 0x5e8ed4, transparent: true, opacity: 0.35 });
+    for (let i = 0; i < 26; i++) {
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.02, 1.3), centerLineMat);
+      seg.position.set(0, 0.02, 10 - i * 4.4);
+      corridor.add(seg);
+    }
+
+    const roomBands = [];
+    for (let i = 0; i < roomData.length; i++) {
+      const z = roomData[i].z;
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(2.2, 0.05, 12, 64),
+        new THREE.MeshBasicMaterial({ color: 0x6bcfff, transparent: true, opacity: 0.24 })
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(0, 0.06, z);
+      corridor.add(ring);
+      roomBands.push(ring);
+    }
+
+    const doors = [];
+    const doorMatLocked = new THREE.MeshStandardMaterial({
+      color: 0x132038,
+      emissive: 0x13233a,
+      metalness: 0.45,
+      roughness: 0.3
+    });
+    const doorMatOpen = new THREE.MeshStandardMaterial({
+      color: 0x1f3658,
+      emissive: 0x2a4c78,
+      metalness: 0.55,
+      roughness: 0.2,
+      transparent: true,
+      opacity: 0.45
+    });
+
+    for (let i = 0; i < roomData.length - 1; i++) {
+      const door = new THREE.Mesh(new THREE.BoxGeometry(5.8, 5.3, 0.5), doorMatLocked.clone());
+      door.position.set(0, 2.65, roomData[i].z - 4);
+      corridor.add(door);
+      doors.push({ mesh: door, open: i === 0 });
+    }
+
+    const interactives = [];
+    const orbMat = new THREE.MeshStandardMaterial({
+      color: 0x88d6ff,
+      emissive: 0x16314e,
+      roughness: 0.25,
+      metalness: 0.15
+    });
+
+    roomData.forEach((room, idx) => {
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 0), orbMat.clone());
+      orb.position.set(0, 1.4, room.z + 0.8);
+      orb.userData = { type: "roomConsole", roomIndex: idx };
+      corridor.add(orb);
+      interactives.push(orb);
+
+      const halo = new THREE.Mesh(
+        new THREE.RingGeometry(0.62, 0.72, 32),
+        new THREE.MeshBasicMaterial({ color: 0xa8ecff, transparent: true, opacity: 0.46, side: THREE.DoubleSide })
+      );
+      halo.position.set(0, 1.4, room.z + 0.8);
+      halo.lookAt(camera.position);
+      corridor.add(halo);
+      orb.userData.halo = halo;
+    });
+
+    const particleCount = 700;
+    const pGeo = new THREE.BufferGeometry();
+    const pPos = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      pPos[i * 3] = (Math.random() - 0.5) * 22;
+      pPos[i * 3 + 1] = Math.random() * 6;
+      pPos[i * 3 + 2] = 20 - Math.random() * 128;
+    }
+    pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+    const pMat = new THREE.PointsMaterial({
+      color: 0x8fd4ff,
+      size: 0.06,
+      transparent: true,
+      opacity: 0.7,
+      depthWrite: false
+    });
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2(0, 0);
+    const velocity = new THREE.Vector3();
+    const direction = new THREE.Vector3();
+    const move = { f: false, b: false, l: false, r: false };
+    let canJump = false;
+    let prevTime = performance.now();
+    let toastTimer = 0;
+
+    function showToast(text, ms = 1700) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.remove("show"), ms);
+    }
+
+    function setStatus() {
+      const roomName = roomData[state.roomUnlocked]?.title || roomData[roomData.length - 1].title;
+      statusBox.innerHTML = `
+        <strong>Escape the Labyrinth of Cancer</strong><br/>
+        Progress key: <span class="success">${state.roomUnlocked + 1}/${roomData.length}</span> rooms unlocked.<br/>
+        Active frontier: ${roomName}.<br/>
+        <span class="subtle">Tip: click glowing cores to interact. Puzzles are optional: quick navigation is always available.</span>
+      `;
+    }
+
+    function buildNav() {
+      quickNav.innerHTML = "";
+      roomData.forEach((room, idx) => {
+        const btn = document.createElement("button");
+        btn.textContent = room.title.replace("Room ", "");
+        btn.disabled = idx > state.roomUnlocked;
+        btn.addEventListener("click", () => {
+          controls.getObject().position.set(0, 1.7, room.z + 1.8);
+          state.roomVisited.add(idx);
+          openRoomContent(idx);
+          showToast(`Jumped to ${room.title}`);
+        });
+        quickNav.appendChild(btn);
+      });
+    }
+
+    function unlockRoom(idx) {
+      if (idx > state.roomUnlocked) {
+        state.roomUnlocked = idx;
+      }
+      if (idx > 0 && doors[idx - 1]) {
+        doors[idx - 1].open = true;
+      }
+      setStatus();
+      buildNav();
+    }
+
+    function openOverlay(html) {
+      overlayCard.innerHTML = html;
+      overlay.style.display = "grid";
+      state.canMove = false;
+      if (controls.isLocked) controls.unlock();
+    }
+
+    function closeOverlay() {
+      overlay.style.display = "none";
+      state.activeModal = "";
+      state.canMove = true;
+      controls.lock();
+    }
+
+    function introModal() {
+      state.activeModal = "intro";
+      openOverlay(`
+        <h1>Escape the Labyrinth of Cancer</h1>
+        <p>A cryptic 3D portfolio where each room reveals research, methods, and mission.</p>
+        <p><strong>Premise:</strong> A communication collapse has spread through a simulated tumor-lab environment. Restore signal flow room by room.</p>
+        <p class="hint">First clue: In the membrane, information arrives as <em>echo -> phase -> light</em>.</p>
+        <div class="row" style="margin-top: 14px;">
+          <button id="startBtn">Enter Airlock</button>
+          <button id="skipBtn">Skip Puzzles (Unlock All)</button>
+        </div>
+        <div id="accessPanel">
+          <strong>Accessibility</strong>
+          <p class="subtle">You can use quick navigation any time. Low-motion mode reduces particle drift and pulse effects.</p>
+        </div>
+      `);
+
+      document.getElementById("startBtn").addEventListener("click", () => {
+        closeOverlay();
+        showToast("Airlock engaged. Seek the first core.");
+      });
+
+      document.getElementById("skipBtn").addEventListener("click", () => {
+        state.roomUnlocked = roomData.length - 1;
+        doors.forEach((d) => (d.open = true));
+        buildNav();
+        setStatus();
+        closeOverlay();
+        showToast("All rooms unlocked. Exploration mode active.");
+      });
+    }
+
+    function puzzleAirlock() {
+      state.activeModal = "puzzle-airlock";
+      openOverlay(`
+        <h2>Membrane Gate</h2>
+        <p>Sequence lock detected. Select the correct triad to restore entry signal.</p>
+        <div class="grid" id="airlockGrid">
+          <button data-seq="phase,echo,light">PHASE -> ECHO -> LIGHT</button>
+          <button data-seq="echo,phase,light">ECHO -> PHASE -> LIGHT</button>
+          <button data-seq="light,echo,phase">LIGHT -> ECHO -> PHASE</button>
+        </div>
+        <p class="hint">Clue fragment: "the membrane listens in delayed order, then oscillates, then emits."</p>
+        <div class="row"><button id="closeModal">Back</button></div>
+      `);
+      document.getElementById("airlockGrid").addEventListener("click", (ev) => {
+        const t = ev.target;
+        if (!(t instanceof HTMLButtonElement)) return;
+        if (t.dataset.seq === "echo,phase,light") {
+          state.puzzleSolved[0] = true;
+          unlockRoom(1);
+          openRoomContent(0, true);
+        } else {
+          showToast("Sequence unstable. Try again.");
+        }
+      });
+      document.getElementById("closeModal").addEventListener("click", closeOverlay);
+    }
+
+    function puzzleSignal() {
+      state.activeModal = "puzzle-signal";
+      openOverlay(`
+        <h2>Signal Transduction Hall</h2>
+        <p>Toggle nodes to build a stable pathway pattern:</p>
+        <p class="hint">Target state: 1 0 1 1 0</p>
+        <div class="grid" id="nodeGrid"></div>
+        <p id="nodeState" class="subtle"></p>
+        <div class="row">
+          <button id="validateNodes">Validate network</button>
+          <button id="closeModal">Back</button>
+        </div>
+      `);
+
+      const vals = [0, 0, 0, 0, 0];
+      const grid = document.getElementById("nodeGrid");
+      const nodeState = document.getElementById("nodeState");
+      function redraw() {
+        grid.innerHTML = "";
+        vals.forEach((v, i) => {
+          const b = document.createElement("button");
+          b.textContent = `Node ${i + 1}: ${v}`;
+          b.addEventListener("click", () => {
+            vals[i] = vals[i] ? 0 : 1;
+            redraw();
+          });
+          grid.appendChild(b);
+        });
+        nodeState.textContent = `Current: ${vals.join(" ")}`;
+      }
+      redraw();
+
+      document.getElementById("validateNodes").addEventListener("click", () => {
+        if (vals.join("") === "10110") {
+          state.puzzleSolved[1] = true;
+          unlockRoom(2);
+          openRoomContent(1, true);
+        } else {
+          showToast("Network remains noisy.");
+        }
+      });
+
+      document.getElementById("closeModal").addEventListener("click", closeOverlay);
+    }
+
+    function puzzleInstruments() {
+      state.activeModal = "puzzle-instruments";
+      openOverlay(`
+        <h2>Instrument Bay Calibration</h2>
+        <p>Set wavelength channels to a resonance profile.</p>
+        <p class="hint">Clue: ATP rises in thirds, CODE settles in fives, SIGNAL falls to two.</p>
+        <div class="grid" id="dialGrid"></div>
+        <p id="dialState" class="subtle"></p>
+        <div class="row">
+          <button id="validateDials">Apply calibration</button>
+          <button id="closeModal">Back</button>
+        </div>
+      `);
+      const vals = [0, 0, 0];
+      const names = ["ATP", "CODE", "SIGNAL"];
+      const dialGrid = document.getElementById("dialGrid");
+      const dialState = document.getElementById("dialState");
+
+      function redraw() {
+        dialGrid.innerHTML = "";
+        vals.forEach((v, i) => {
+          const b = document.createElement("button");
+          b.textContent = `${names[i]}: ${v}`;
+          b.addEventListener("click", () => {
+            vals[i] = (vals[i] + 1) % 10;
+            redraw();
+          });
+          dialGrid.appendChild(b);
+        });
+        dialState.textContent = `Current: ${vals.join(" / ")}`;
+      }
+      redraw();
+
+      document.getElementById("validateDials").addEventListener("click", () => {
+        if (vals[0] === 3 && vals[1] === 5 && vals[2] === 2) {
+          state.puzzleSolved[2] = true;
+          unlockRoom(3);
+          openRoomContent(2, true);
+        } else {
+          showToast("Calibration failed.");
+        }
+      });
+      document.getElementById("closeModal").addEventListener("click", closeOverlay);
+    }
+
+    function puzzleArchive() {
+      state.activeModal = "puzzle-archive";
+      openOverlay(`
+        <h2>Archive Vault</h2>
+        <p>Select the 3 collections that match this portfolio archive.</p>
+        <div id="archiveChecks" class="grid">
+          <label><input type="checkbox" value="evolution"> Tumor Evolution</label>
+          <label><input type="checkbox" value="immunity"> Immune Ecology</label>
+          <label><input type="checkbox" value="spatial"> Spatial Biology</label>
+          <label><input type="checkbox" value="astronomy"> Deep Space Cosmology</label>
+          <label><input type="checkbox" value="volcanology"> Volcanic Stratification</label>
+        </div>
+        <div class="row">
+          <button id="validateArchive">Unlock archive</button>
+          <button id="closeModal">Back</button>
+        </div>
+      `);
+      document.getElementById("validateArchive").addEventListener("click", () => {
+        const picks = [...document.querySelectorAll('#archiveChecks input:checked')].map((el) => el.value).sort();
+        const target = ["evolution", "immunity", "spatial"].sort();
+        if (JSON.stringify(picks) === JSON.stringify(target)) {
+          state.puzzleSolved[3] = true;
+          unlockRoom(4);
+          openRoomContent(3, true);
+        } else {
+          showToast("Archive key mismatch.");
+        }
+      });
+      document.getElementById("closeModal").addEventListener("click", closeOverlay);
+    }
+
+    function puzzleEvolution() {
+      state.activeModal = "puzzle-evolution";
+      openOverlay(`
+        <h2>Evolution Chamber</h2>
+        <p>Final semantic lock: type the value that turns insight into impact.</p>
+        <input id="finalWord" style="width:100%;padding:10px;background:#0f1e38;color:#e7f1ff;border:1px solid #6f9fd8;border-radius:8px;" placeholder="Enter keyword..." />
+        <p class="hint">Hint: It is the final key to escaping this lab.</p>
+        <div class="row">
+          <button id="validateWord">Transmit</button>
+          <button id="closeModal">Back</button>
+        </div>
+      `);
+      document.getElementById("validateWord").addEventListener("click", () => {
+        const val = document.getElementById("finalWord").value.trim().toLowerCase();
+        if (val === "collaboration") {
+          state.puzzleSolved[4] = true;
+          unlockRoom(5);
+          openRoomContent(4, true);
+        } else {
+          showToast("Transmission rejected.");
+        }
+      });
+      document.getElementById("closeModal").addEventListener("click", closeOverlay);
+    }
+
+    function openRoomContent(index, unlocked = false) {
+      state.roomVisited.add(index);
+      const room = roomData[index];
+      const nextHint =
+        index < roomData.length - 1
+          ? `<p class="hint">Next room awaits. Follow the corridor and activate the next core.</p>`
+          : `<p class="success">Escape complete. Collaboration is the final key.</p>`;
+
+      openOverlay(`
+        <h2>${room.title}</h2>
+        ${unlocked ? `<p class="success">Mechanism unlocked.</p>` : ""}
+        ${room.content}
+        ${nextHint}
+        <div class="row">
+          <button id="continueBtn">${index < roomData.length - 1 ? "Continue Exploration" : "Re-enter Lab"}</button>
+        </div>
+      `);
+      document.getElementById("continueBtn").addEventListener("click", closeOverlay);
+    }
+
+    function handleRoomConsole(index) {
+      if (index === 0 && !state.puzzleSolved[0]) return puzzleAirlock();
+      if (index === 1 && !state.puzzleSolved[1]) {
+        if (state.roomUnlocked < 1) return showToast("Airlock sequence first.");
+        return puzzleSignal();
+      }
+      if (index === 2 && !state.puzzleSolved[2]) {
+        if (state.roomUnlocked < 2) return showToast("Signal hall not resolved.");
+        return puzzleInstruments();
+      }
+      if (index === 3 && !state.puzzleSolved[3]) {
+        if (state.roomUnlocked < 3) return showToast("Instrument calibration incomplete.");
+        return puzzleArchive();
+      }
+      if (index === 4 && !state.puzzleSolved[4]) {
+        if (state.roomUnlocked < 4) return showToast("Archive not yet stable.");
+        return puzzleEvolution();
+      }
+      if (index === 5) return openRoomContent(5);
+      return openRoomContent(index);
+    }
+
+    function updateDoors(delta) {
+      doors.forEach((d, idx) => {
+        const targetY = d.open ? 7.4 : 2.65;
+        d.mesh.position.y += (targetY - d.mesh.position.y) * Math.min(1, delta * 4.2);
+        const mat = d.mesh.material;
+        if (d.open) {
+          mat.emissive.lerp(new THREE.Color(0x2a4c78), 0.05);
+          mat.opacity = 0.45;
+          mat.transparent = true;
+          mat.color.lerp(new THREE.Color(0x27466b), 0.05);
+        } else {
+          mat.emissive.lerp(new THREE.Color(0x13233a), 0.05);
+          mat.opacity = 1;
+          mat.transparent = false;
+          mat.color.lerp(new THREE.Color(0x132038), 0.05);
+        }
+
+        const doorZ = roomData[idx].z - 4;
+        const p = controls.getObject().position;
+        if (!d.open && Math.abs(p.x) < 2.7 && p.z < doorZ + 0.65 && p.z > doorZ - 0.65) {
+          p.z = doorZ + 0.85;
+          showToast("Door sealed. Solve room mechanism.");
+        }
+      });
+    }
+
+    function updateScenePulse(time) {
+      roomBands.forEach((ring, idx) => {
+        const near = Math.abs(controls.getObject().position.z - roomData[idx].z) < 4;
+        const base = near ? 0.6 : 0.24;
+        ring.material.opacity = state.lowMotion ? (near ? 0.35 : 0.2) : base + Math.sin(time * 0.0018 + idx) * 0.09;
+      });
+
+      interactives.forEach((obj, idx) => {
+        const solved = state.puzzleSolved[idx] || idx === 5;
+        const mat = obj.material;
+        if (solved) {
+          mat.color.lerp(new THREE.Color(0x8fffc3), 0.05);
+          mat.emissive.lerp(new THREE.Color(0x2a6f56), 0.06);
+        } else {
+          mat.color.lerp(new THREE.Color(0x88d6ff), 0.05);
+          mat.emissive.lerp(new THREE.Color(0x16314e), 0.06);
+        }
+
+        if (!state.lowMotion) {
+          obj.rotation.y += 0.012;
+          obj.position.y = 1.4 + Math.sin(time * 0.0016 + idx * 0.8) * 0.15;
+          if (obj.userData.halo) obj.userData.halo.rotation.z += 0.01;
+        }
+      });
+    }
+
+    document.addEventListener("click", () => {
+      if (overlay.style.display !== "none") return;
+      if (!controls.isLocked) {
+        controls.lock();
+        return;
+      }
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(interactives, false);
+      if (hits.length > 0 && hits[0].distance < 3.2) {
+        const idx = hits[0].object.userData.roomIndex;
+        handleRoomConsole(idx);
+      }
+    });
+
+    controls.addEventListener("lock", () => {
+      if (overlay.style.display === "none") state.canMove = true;
+    });
+
+    controls.addEventListener("unlock", () => {
+      state.canMove = false;
+    });
+
+    lowMotionToggle.addEventListener("change", () => {
+      state.lowMotion = lowMotionToggle.checked;
+      pMat.opacity = state.lowMotion ? 0.35 : 0.7;
+      showToast(state.lowMotion ? "Low motion enabled." : "Low motion disabled.");
+    });
+
+    document.addEventListener("keydown", (event) => {
+      switch (event.code) {
+        case "KeyW": move.f = true; break;
+        case "KeyA": move.l = true; break;
+        case "KeyS": move.b = true; break;
+        case "KeyD": move.r = true; break;
+        case "Space":
+          if (canJump && state.canMove) {
+            velocity.y += 5.2;
+            canJump = false;
+          }
+          break;
+      }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      switch (event.code) {
+        case "KeyW": move.f = false; break;
+        case "KeyA": move.l = false; break;
+        case "KeyS": move.b = false; break;
+        case "KeyD": move.r = false; break;
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animate() {
+      const time = performance.now();
+      const delta = (time - prevTime) / 1000;
+      prevTime = time;
+
+      if (state.canMove && controls.isLocked) {
+        velocity.x -= velocity.x * 9.5 * delta;
+        velocity.z -= velocity.z * 9.5 * delta;
+        velocity.y -= 14.5 * delta;
+
+        direction.z = Number(move.f) - Number(move.b);
+        direction.x = Number(move.r) - Number(move.l);
+        direction.normalize();
+
+        const speed = 15.5;
+        if (move.f || move.b) velocity.z -= direction.z * speed * delta;
+        if (move.l || move.r) velocity.x -= direction.x * speed * delta;
+
+        controls.moveRight(-velocity.x * delta);
+        controls.moveForward(-velocity.z * delta);
+        controls.getObject().position.y += velocity.y * delta;
+
+        if (controls.getObject().position.y < 1.7) {
+          velocity.y = 0;
+          controls.getObject().position.y = 1.7;
+          canJump = true;
+        }
+
+        controls.getObject().position.x = THREE.MathUtils.clamp(controls.getObject().position.x, -5.3, 5.3);
+        controls.getObject().position.z = THREE.MathUtils.clamp(controls.getObject().position.z, -101, 14);
+      }
+
+      updateDoors(delta);
+      updateScenePulse(time);
+
+      if (!state.lowMotion) {
+        particles.rotation.y += 0.00015;
+        particles.position.y = Math.sin(time * 0.00033) * 0.1;
+      }
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    setStatus();
+    buildNav();
+    introModal();
+    animate();
+  </script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oz Kilim | Quantum Paper Run</title>
+  <meta name="description" content="A playable 3D science-game portfolio by Oz Kilim. Run as a wild scientist over a research-paper world with floating equations and surreal lab physics.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ozkilim.github.io/ozkilim/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Oz Kilim | Quantum Paper Run">
+  <meta property="og:description" content="Play a chaotic 3D science game portfolio experiment by Oz Kilim.">
+  <meta property="og:url" content="https://ozkilim.github.io/ozkilim/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Oz Kilim | Quantum Paper Run">
+  <meta name="twitter:description" content="A keyboard-playable 3D science portfolio game with equations and lab chaos.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Oz Kilim",
+    "url": "https://ozkilim.github.io/ozkilim/",
+    "description": "Builder creating creative GEO and SEO web experiences.",
+    "email": "hello@example.com"
+  }
+  </script>
+
+  <style>
+    :root {
+      --hud-bg: rgba(5, 8, 22, 0.7);
+      --hud-border: rgba(101, 246, 255, 0.4);
+      --ink: #ddf6ff;
+      --muted: #96b7cc;
+      --accent: #78f8ff;
+      --danger: #ff3f7e;
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 20% 20%, #1b213d, #04050f 60%);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+    #game {
+      position: fixed;
+      inset: 0;
+    }
+    .hud {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      z-index: 20;
+      pointer-events: none;
+      transition: opacity 500ms ease;
+    }
+    .panel {
+      background: var(--hud-bg);
+      border: 1px solid var(--hud-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(6px);
+      min-height: 52px;
+    }
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .value {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .value-danger {
+      color: var(--danger);
+    }
+    .center-panel {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 25;
+      width: min(720px, calc(100vw - 36px));
+      background: rgba(7, 11, 28, 0.74);
+      border: 1px solid rgba(120, 248, 255, 0.35);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      font-size: 14px;
+      transition: opacity 500ms ease, transform 500ms ease;
+    }
+    .center-panel strong {
+      color: var(--accent);
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      background: radial-gradient(circle at center, rgba(30, 52, 92, 0.6), rgba(2, 3, 8, 0.92));
+      text-align: center;
+      padding: 24px;
+      transition: opacity 600ms ease;
+    }
+    .overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .card {
+      width: min(760px, 90vw);
+      background: rgba(10, 13, 33, 0.84);
+      border: 1px solid rgba(120, 248, 255, 0.4);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0.04em;
+    }
+    p {
+      margin: 8px 0;
+      color: #d2ecfa;
+    }
+    .button {
+      margin-top: 16px;
+      border: 1px solid rgba(120, 248, 255, 0.7);
+      background: linear-gradient(120deg, #66d7f6, #8771ff);
+      color: #05111e;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      padding: 12px 24px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .seo-copy {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      left: 0;
+      top: 0;
+    }
+    .ui-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+    }
+    .ui-hidden-top {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #puzzleOverlay {
+      background: radial-gradient(circle at center, rgba(12, 16, 36, 0.35), rgba(0, 0, 0, 0.96));
+    }
+    .puzzle-shell {
+      width: min(720px, 90vw);
+      border: 1px solid rgba(150, 240, 255, 0.35);
+      border-radius: 20px;
+      padding: 20px;
+      color: rgba(218, 241, 255, 0.9);
+      background: rgba(6, 10, 24, 0.55);
+      backdrop-filter: blur(6px);
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      text-align: center;
+    }
+    .puzzle-label {
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: rgba(189, 225, 255, 0.72);
+    }
+    .puzzle-title {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
+    .puzzle-hint {
+      font-size: 13px;
+      color: rgba(196, 222, 238, 0.76);
+      min-height: 18px;
+    }
+    .puzzle-progress {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(140, 255, 241, 0.9);
+    }
+    #puzzle2d {
+      width: min(520px, 82vw);
+      height: min(280px, 42vw);
+      border-radius: 12px;
+      border: 1px solid rgba(120, 236, 255, 0.35);
+      background: rgba(6, 10, 24, 0.45);
+      display: none;
+      touch-action: none;
+    }
+    @media (max-width: 760px) {
+      .hud {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .center-panel {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div class="overlay" id="puzzleOverlay">
+    <div class="puzzle-shell">
+      <div class="puzzle-label">Specimen-0</div>
+      <h2 class="puzzle-title" id="puzzleTitle">Observe</h2>
+      <div class="puzzle-hint" id="puzzleHint"></div>
+      <canvas id="puzzle2d" width="720" height="380"></canvas>
+      <div class="puzzle-progress" id="puzzleProgress">Stage 1 / 3</div>
+    </div>
+  </div>
+
+  <div class="hud ui-hidden-top" id="hudWrap">
+    <div class="panel">
+      <div class="label">Score</div>
+      <div id="score" class="value">0</div>
+    </div>
+    <div class="panel">
+      <div class="label">Health</div>
+      <div id="health" class="value">100</div>
+    </div>
+    <div class="panel">
+      <div class="label">Time</div>
+      <div id="time" class="value">60</div>
+    </div>
+    <div class="panel">
+      <div class="label">Mode</div>
+      <div id="mode" class="value value-danger">Survive</div>
+    </div>
+  </div>
+
+  <div class="center-panel ui-hidden" id="controlsPanel">
+    <strong>Controls:</strong> WASD / Arrow Keys run, <strong>Shift</strong> sprint, <strong>Space</strong> quantum pulse, <strong>R</strong> restart.
+  </div>
+
+  <div class="overlay" id="startOverlay" style="display: none;">
+    <div class="card">
+      <h1>Quantum Paper Run</h1>
+      <p>You are a rogue scientist escaping through a living research paper simulation.</p>
+      <p>Collect insight cores, avoid anomaly drones, and survive the unstable experiment.</p>
+      <button class="button" id="startBtn">Enter the Experiment</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="endOverlay" style="display: none;">
+    <div class="card">
+      <h1 id="endTitle">Experiment Complete</h1>
+      <p id="endText">The equations briefly obeyed your will.</p>
+      <button class="button" id="restartBtn">Run Again</button>
+    </div>
+  </div>
+
+  <section class="seo-copy">
+    <h2>Oz Kilim Interactive Science Portfolio</h2>
+    <p>This page is an experimental 3D science-themed web portfolio game by Oz Kilim focused on creative GEO and SEO experiences.</p>
+    <p>Visitors can play a keyboard mini-game with floating equations and a research-paper world while exploring technical web storytelling.</p>
+    <p>Contact: hello@example.com</p>
+  </section>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.170.0"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from "three";
+
+    const canvas = document.getElementById("game");
+    const scoreEl = document.getElementById("score");
+    const healthEl = document.getElementById("health");
+    const timeEl = document.getElementById("time");
+    const modeEl = document.getElementById("mode");
+    const startOverlay = document.getElementById("startOverlay");
+    const puzzleOverlay = document.getElementById("puzzleOverlay");
+    const puzzleTitle = document.getElementById("puzzleTitle");
+    const puzzleHint = document.getElementById("puzzleHint");
+    const puzzleProgress = document.getElementById("puzzleProgress");
+    const puzzle2d = document.getElementById("puzzle2d");
+    const puzzle2dCtx = puzzle2d.getContext("2d");
+    const hudWrap = document.getElementById("hudWrap");
+    const controlsPanel = document.getElementById("controlsPanel");
+    const endOverlay = document.getElementById("endOverlay");
+    const endTitle = document.getElementById("endTitle");
+    const endText = document.getElementById("endText");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x090313, 0.023);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+
+    const camera = new THREE.PerspectiveCamera(64, window.innerWidth / window.innerHeight, 0.1, 240);
+    camera.position.set(0, 7.4, 9.6);
+    camera.lookAt(0, 1.0, 0);
+
+    const ambient = new THREE.AmbientLight(0x8a94ff, 1.2);
+    scene.add(ambient);
+
+    const keyLight = new THREE.DirectionalLight(0xa2f9ff, 1.5);
+    keyLight.position.set(12, 18, 8);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0xff4693, 0.95);
+    rimLight.position.set(-11, 6, -7);
+    scene.add(rimLight);
+
+    function createPaperTexture() {
+      const paper = document.createElement("canvas");
+      paper.width = 2048;
+      paper.height = 2048;
+      const ctx = paper.getContext("2d");
+      ctx.fillStyle = "#f4f2ea";
+      ctx.fillRect(0, 0, paper.width, paper.height);
+
+      ctx.globalAlpha = 0.05;
+      for (let i = 0; i < 12000; i++) {
+        const x = Math.random() * paper.width;
+        const y = Math.random() * paper.height;
+        const shade = 220 + Math.floor(Math.random() * 35);
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade - 4})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = "rgba(20, 40, 80, 0.08)";
+      ctx.lineWidth = 1;
+      for (let y = 32; y < paper.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(paper.width, y);
+        ctx.stroke();
+      }
+
+      const equations = [
+        "dS/dt = alpha * Psi - beta * Sigma",
+        "E^2 = p^2 c^2 + m^2 c^4",
+        "Z(int) = int exp(i/hbar * L) Dq",
+        "nabla x E = -dB/dt",
+        "sum(k=1 to N) lambda_k phi_k(x)",
+        "F(mu,nu) = partial_mu A_nu - partial_nu A_mu",
+        "L = T - V + epsilon sin(omega t)",
+        "P(rank|query) proportional to relevance * authority",
+        "sigma = sqrt(E[x^2] - E[x]^2)",
+        "H Psi = i hbar partial_t Psi",
+        "ARGMAX(p(theta|data))"
+      ];
+      const paragraphs = [
+        "Abstract: We model chaotic ranking dynamics under adversarial entropy fields and derive practical interventions for resilient search visibility.",
+        "Methodology: A hybrid simulation combines symbolic constraints and empirical clickstream observations from synthetic information markets.",
+        "Result: High-confidence authority clusters emerge when local relevance gradients are reinforced with semantic consistency and temporal freshness.",
+        "Discussion: This framework links interpretability in AI retrieval systems to measurable growth outcomes in GEO and SEO strategy design.",
+        "Conclusion: Minimal pages can host maximal narratives when interaction, information architecture, and identity signals are jointly optimized."
+      ];
+
+      ctx.fillStyle = "rgba(8, 18, 40, 0.72)";
+      ctx.font = "24px Georgia, serif";
+      let y = 80;
+      for (let i = 0; i < 18; i++) {
+        const p = paragraphs[i % paragraphs.length];
+        const words = p.split(" ");
+        let line = "";
+        let x = 72;
+        for (const word of words) {
+          const test = `${line}${word} `;
+          if (ctx.measureText(test).width > 580) {
+            ctx.fillText(line, x, y);
+            y += 30;
+            line = `${word} `;
+          } else {
+            line = test;
+          }
+        }
+        ctx.fillText(line, x, y);
+        y += 44;
+        ctx.font = "bold 26px Georgia, serif";
+        ctx.fillStyle = "rgba(16, 38, 70, 0.76)";
+        ctx.fillText(equations[i % equations.length], 72, y);
+        y += 58;
+        ctx.font = "24px Georgia, serif";
+        ctx.fillStyle = "rgba(8, 18, 40, 0.72)";
+        if (y > paper.height - 70) y = 80;
+      }
+
+      const tex = new THREE.CanvasTexture(paper);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6.5, 6.5);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function makeEquationTexture(text, color = "#95fff8") {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 128;
+      const ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.fillStyle = "rgba(5, 9, 26, 0.35)";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.strokeStyle = "rgba(149, 255, 248, 0.35)";
+      ctx.strokeRect(4, 4, c.width - 8, c.height - 8);
+      ctx.fillStyle = color;
+      ctx.font = "bold 42px 'Times New Roman', serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, c.width / 2, c.height / 2);
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    const paperTexture = createPaperTexture();
+    const floorGeo = new THREE.PlaneGeometry(140, 140, 120, 120);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0xe8f2ff,
+      map: paperTexture,
+      emissive: 0x2b1a4a,
+      emissiveMap: paperTexture,
+      emissiveIntensity: 0.06,
+      metalness: 0.08,
+      roughness: 0.86
+    });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.02;
+    scene.add(floor);
+
+    const pos = floorGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const ripple = Math.sin(x * 0.12) * Math.cos(y * 0.15) * 0.52;
+      pos.setZ(i, ripple);
+    }
+    pos.needsUpdate = true;
+    floorGeo.computeVertexNormals();
+
+    const grid = new THREE.GridHelper(120, 70, 0x57d6ff, 0x3c2d72);
+    grid.position.y = 0.03;
+    scene.add(grid);
+
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 1600;
+    const starPos = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      starPos[i * 3] = (Math.random() - 0.5) * 240;
+      starPos[i * 3 + 1] = Math.random() * 68 + 2;
+      starPos[i * 3 + 2] = (Math.random() - 0.5) * 240;
+    }
+    starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+    const stars = new THREE.Points(
+      starGeo,
+      new THREE.PointsMaterial({ color: 0xf8e4ff, size: 0.18, sizeAttenuation: true, transparent: true, opacity: 0.8 })
+    );
+    scene.add(stars);
+
+    function createScientist() {
+      const scientist = new THREE.Group();
+      const coatMat = new THREE.MeshStandardMaterial({ color: 0xf5f9ff, roughness: 0.42, metalness: 0.08 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xffd7b8, roughness: 0.5, metalness: 0.02 });
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x1b1f3b, roughness: 0.35, metalness: 0.2 });
+      const neonMat = new THREE.MeshStandardMaterial({ color: 0x66f2ff, emissive: 0x2398a8, emissiveIntensity: 0.8 });
+
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.1, 0.45), coatMat);
+      torso.position.y = 1.45;
+      scientist.add(torso);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.33, 18, 18), skinMat);
+      head.position.y = 2.22;
+      scientist.add(head);
+
+      const hair = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 0), darkMat);
+      hair.position.set(0, 2.5, 0.03);
+      hair.scale.set(1.6, 0.8, 1.4);
+      scientist.add(hair);
+
+      const goggles = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 10, 20), neonMat);
+      goggles.position.set(0, 2.2, 0.28);
+      goggles.rotation.x = Math.PI / 2;
+      scientist.add(goggles);
+
+      const satchel = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.42, 0.25), darkMat);
+      satchel.position.set(-0.48, 1.4, 0.02);
+      scientist.add(satchel);
+
+      const leftArmPivot = new THREE.Group();
+      leftArmPivot.position.set(-0.5, 1.8, 0);
+      const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.62, 4, 10), coatMat);
+      leftArm.rotation.z = 0.1;
+      leftArm.position.y = -0.36;
+      leftArmPivot.add(leftArm);
+      scientist.add(leftArmPivot);
+
+      const rightArmPivot = new THREE.Group();
+      rightArmPivot.position.set(0.5, 1.8, 0);
+      const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.62, 4, 10), coatMat);
+      rightArm.rotation.z = -0.1;
+      rightArm.position.y = -0.36;
+      rightArmPivot.add(rightArm);
+      scientist.add(rightArmPivot);
+
+      const leftLegPivot = new THREE.Group();
+      leftLegPivot.position.set(-0.22, 0.98, 0);
+      const leftLeg = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.7, 4, 10), darkMat);
+      leftLeg.position.y = -0.41;
+      leftLegPivot.add(leftLeg);
+      scientist.add(leftLegPivot);
+
+      const rightLegPivot = new THREE.Group();
+      rightLegPivot.position.set(0.22, 0.98, 0);
+      const rightLeg = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.7, 4, 10), darkMat);
+      rightLeg.position.y = -0.41;
+      rightLegPivot.add(rightLeg);
+      scientist.add(rightLegPivot);
+
+      const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.1, 0.44), neonMat);
+      leftShoe.position.set(-0.22, 0.56, 0.1);
+      scientist.add(leftShoe);
+
+      const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.1, 0.44), neonMat);
+      rightShoe.position.set(0.22, 0.56, 0.1);
+      scientist.add(rightShoe);
+
+      scientist.userData.parts = { leftArmPivot, rightArmPivot, leftLegPivot, rightLegPivot, goggles, satchel };
+      scientist.position.set(0, 0.25, 0);
+      return scientist;
+    }
+
+    const scientist = createScientist();
+    scene.add(scientist);
+
+    const pulseRing = new THREE.Mesh(
+      new THREE.TorusGeometry(1.0, 0.08, 14, 46),
+      new THREE.MeshStandardMaterial({ color: 0x84f8ff, emissive: 0x36a9bb, emissiveIntensity: 1.05, transparent: true, opacity: 0.75 })
+    );
+    pulseRing.rotation.x = Math.PI / 2;
+    pulseRing.position.y = 0.26;
+    scientist.add(pulseRing);
+
+    const lockCore = new THREE.Group();
+    const lockOrb = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.05, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0xb0b7ff,
+        emissive: 0x4a2f9f,
+        emissiveIntensity: 1.25,
+        metalness: 0.5,
+        roughness: 0.22
+      })
+    );
+    lockCore.add(lockOrb);
+    const lockHalo = new THREE.Mesh(
+      new THREE.TorusGeometry(1.65, 0.09, 20, 64),
+      new THREE.MeshStandardMaterial({
+        color: 0x90f6ff,
+        emissive: 0x48a8bc,
+        emissiveIntensity: 1.1,
+        transparent: true,
+        opacity: 0.9
+      })
+    );
+    lockHalo.rotation.x = Math.PI / 2;
+    lockCore.add(lockHalo);
+    lockCore.position.set(0, 1.8, 0);
+    scene.add(lockCore);
+
+    const stage3Runes = [];
+    for (let i = 0; i < 3; i++) {
+      const rune = new THREE.Mesh(
+        new THREE.TetrahedronGeometry(0.25, 0),
+        new THREE.MeshStandardMaterial({
+          color: 0xb7f7ff,
+          emissive: 0x246f7e,
+          emissiveIntensity: 0.8,
+          metalness: 0.4,
+          roughness: 0.18
+        })
+      );
+      rune.visible = false;
+      stage3Runes.push(rune);
+      scene.add(rune);
+    }
+
+    const orbGeo = new THREE.IcosahedronGeometry(0.28, 1);
+    const orbMat = new THREE.MeshStandardMaterial({
+      color: 0x89ffff,
+      emissive: 0x2db3c7,
+      emissiveIntensity: 1.4,
+      metalness: 0.3,
+      roughness: 0.2
+    });
+
+    const hunterGeo = new THREE.OctahedronGeometry(0.42, 0);
+    const hunterMat = new THREE.MeshStandardMaterial({
+      color: 0xff5db2,
+      emissive: 0xa11f59,
+      emissiveIntensity: 1.0,
+      metalness: 0.4,
+      roughness: 0.2
+    });
+
+    const worldSize = 26;
+    const maxOrbs = 22;
+    const maxHunters = 11;
+    const orbs = [];
+    const hunters = [];
+    const pulses = [];
+    const equationSprites = [];
+    const keys = new Set();
+    const tempVec = new THREE.Vector3();
+
+    let isRunning = false;
+    let score = 0;
+    let health = 100;
+    let gameTime = 75;
+    let sprintCharge = 1;
+    let stride = 0;
+    let worldUnlocked = false;
+    let puzzleSolved = false;
+    let puzzleStage = 1;
+    let stage3Hits = 0;
+    let stage3Phase = 0;
+    let dragging = false;
+    let lastAngle = null;
+    let angleTravel = 0;
+    let validSamples = 0;
+    let stage2Active = false;
+    let stage2Dragging = false;
+    let stage2Current = 0;
+
+    const stage2Nodes = [
+      { x: 0.18, y: 0.52 },
+      { x: 0.36, y: 0.28 },
+      { x: 0.62, y: 0.3 },
+      { x: 0.78, y: 0.56 },
+      { x: 0.56, y: 0.76 },
+      { x: 0.3, y: 0.72 }
+    ];
+
+    const clock = new THREE.Clock();
+
+    const floatingEquations = [
+      "E = mc^2", "nabla·E = rho/eps0", "H Psi = i hbar dPsi/dt", "int L dt", "lambda = h/p",
+      "delta x delta p >= hbar/2", "R = d/ln(t)", "sigma^2 = E[x^2]-mu^2", "F = ma", "exp(i*pi)+1=0"
+    ];
+
+    function createEquationCloud() {
+      for (let i = 0; i < 70; i++) {
+        const label = floatingEquations[i % floatingEquations.length];
+        const map = makeEquationTexture(label, i % 2 ? "#95fff8" : "#ffa9dc");
+        const sprite = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map,
+            transparent: true,
+            opacity: 0.48 + Math.random() * 0.25,
+            depthWrite: false
+          })
+        );
+        sprite.scale.set(2.7 + Math.random() * 1.2, 0.7 + Math.random() * 0.35, 1);
+        sprite.position.set(
+          (Math.random() - 0.5) * worldSize * 2.7,
+          1.4 + Math.random() * 6.5,
+          (Math.random() - 0.5) * worldSize * 2.7
+        );
+        sprite.userData.drift = new THREE.Vector3((Math.random() - 0.5) * 0.35, (Math.random() - 0.5) * 0.08, (Math.random() - 0.5) * 0.35);
+        sprite.userData.phase = Math.random() * Math.PI * 2;
+        equationSprites.push(sprite);
+        scene.add(sprite);
+      }
+    }
+    createEquationCloud();
+
+    const revealables = [floor, grid, stars, scientist, ...equationSprites];
+    for (const obj of revealables) {
+      obj.visible = false;
+    }
+
+    function setPuzzleStage(stage) {
+      puzzleStage = stage;
+      puzzleProgress.textContent = `Stage ${stage} / 3`;
+      if (stage === 1) {
+        puzzleTitle.textContent = "Observe";
+        puzzleHint.textContent = "";
+        puzzle2d.style.display = "none";
+        stage2Active = false;
+        for (const rune of stage3Runes) rune.visible = false;
+      } else if (stage === 2) {
+        puzzleTitle.textContent = "Trace";
+        puzzleHint.textContent = " ";
+        puzzle2d.style.display = "block";
+        stage2Active = true;
+        stage2Current = 0;
+        drawStage2Puzzle();
+      } else if (stage === 3) {
+        puzzleTitle.textContent = "Resonate";
+        puzzleHint.textContent = " ";
+        puzzle2d.style.display = "none";
+        stage2Active = false;
+        stage3Hits = 0;
+        for (const rune of stage3Runes) rune.visible = true;
+      }
+    }
+
+    function drawStage2Puzzle(pointer = null) {
+      const w = puzzle2d.width;
+      const h = puzzle2d.height;
+      puzzle2dCtx.clearRect(0, 0, w, h);
+      const grad = puzzle2dCtx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "rgba(18, 28, 66, 0.6)");
+      grad.addColorStop(1, "rgba(7, 11, 30, 0.7)");
+      puzzle2dCtx.fillStyle = grad;
+      puzzle2dCtx.fillRect(0, 0, w, h);
+
+      puzzle2dCtx.strokeStyle = "rgba(130, 194, 255, 0.18)";
+      puzzle2dCtx.lineWidth = 1;
+      for (let x = 24; x < w; x += 32) {
+        puzzle2dCtx.beginPath();
+        puzzle2dCtx.moveTo(x, 0);
+        puzzle2dCtx.lineTo(x, h);
+        puzzle2dCtx.stroke();
+      }
+      for (let y = 18; y < h; y += 24) {
+        puzzle2dCtx.beginPath();
+        puzzle2dCtx.moveTo(0, y);
+        puzzle2dCtx.lineTo(w, y);
+        puzzle2dCtx.stroke();
+      }
+
+      puzzle2dCtx.lineWidth = 4;
+      puzzle2dCtx.strokeStyle = "rgba(120, 255, 232, 0.65)";
+      puzzle2dCtx.beginPath();
+      for (let i = 0; i < stage2Current; i++) {
+        const node = stage2Nodes[i];
+        const x = node.x * w;
+        const y = node.y * h;
+        if (i === 0) puzzle2dCtx.moveTo(x, y);
+        else puzzle2dCtx.lineTo(x, y);
+      }
+      if (pointer && stage2Current > 0) {
+        puzzle2dCtx.lineTo(pointer.x, pointer.y);
+      }
+      puzzle2dCtx.stroke();
+
+      for (let i = 0; i < stage2Nodes.length; i++) {
+        const node = stage2Nodes[i];
+        const x = node.x * w;
+        const y = node.y * h;
+        const active = i <= stage2Current;
+        puzzle2dCtx.beginPath();
+        puzzle2dCtx.arc(x, y, active ? 10 : 7, 0, Math.PI * 2);
+        puzzle2dCtx.fillStyle = active ? "rgba(130,255,240,0.95)" : "rgba(187,220,255,0.5)";
+        puzzle2dCtx.fill();
+      }
+    }
+
+    function completeStage2() {
+      stage2Active = false;
+      setPuzzleStage(3);
+    }
+
+    function randomPos() {
+      return new THREE.Vector3(
+        (Math.random() - 0.5) * worldSize * 2,
+        0.8 + Math.random() * 0.9,
+        (Math.random() - 0.5) * worldSize * 2
+      );
+    }
+
+    function spawnOrb() {
+      const orb = new THREE.Mesh(orbGeo, orbMat.clone());
+      orb.position.copy(randomPos());
+      orb.userData.baseY = orb.position.y;
+      orb.userData.spin = 0.8 + Math.random() * 1.8;
+      scene.add(orb);
+      orbs.push(orb);
+    }
+
+    function spawnHunter() {
+      const hunter = new THREE.Mesh(hunterGeo, hunterMat.clone());
+      hunter.position.copy(randomPos());
+      hunter.position.y = 0.95;
+      hunter.userData.speed = 1.1 + Math.random() * 1.8;
+      hunter.userData.wobble = Math.random() * Math.PI * 2;
+      scene.add(hunter);
+      hunters.push(hunter);
+    }
+
+    function createPulse() {
+      const pulse = new THREE.Mesh(
+        new THREE.RingGeometry(0.8, 1.02, 40),
+        new THREE.MeshBasicMaterial({
+          color: 0xb9f9ff,
+          transparent: true,
+          opacity: 0.95,
+          side: THREE.DoubleSide
+        })
+      );
+      pulse.rotation.x = -Math.PI / 2;
+      pulse.position.set(scientist.position.x, 0.06, scientist.position.z);
+      pulse.userData.radius = 0.95;
+      pulse.userData.life = 1;
+      scene.add(pulse);
+      pulses.push(pulse);
+    }
+
+    function updateHud() {
+      scoreEl.textContent = String(score);
+      healthEl.textContent = String(Math.max(0, Math.round(health)));
+      timeEl.textContent = String(Math.max(0, Math.ceil(gameTime)));
+    }
+
+    function resetState() {
+      score = 0;
+      health = 100;
+      gameTime = 75;
+      sprintCharge = 1;
+      stride = 0;
+      scientist.position.set(0, 0.25, 0);
+      scientist.rotation.set(0, 0, 0);
+      for (const obj of [...orbs, ...hunters, ...pulses]) {
+        scene.remove(obj);
+        obj.geometry.dispose?.();
+        obj.material.dispose?.();
+      }
+      orbs.length = 0;
+      hunters.length = 0;
+      pulses.length = 0;
+      for (let i = 0; i < maxOrbs; i++) spawnOrb();
+      for (let i = 0; i < maxHunters; i++) spawnHunter();
+      modeEl.textContent = "Experiment";
+      modeEl.classList.add("value-danger");
+      updateHud();
+    }
+
+    function startGame() {
+      if (!worldUnlocked) return;
+      resetState();
+      isRunning = true;
+      startOverlay.style.display = "none";
+      endOverlay.style.display = "none";
+      clock.start();
+    }
+
+    function endGame(victory) {
+      isRunning = false;
+      endOverlay.style.display = "flex";
+      endTitle.textContent = victory ? "Lab Stabilized" : "Containment Failed";
+      endText.textContent = victory
+        ? `You escaped with ${score} insight points.`
+        : `Anomaly swarm reached critical mass. Score: ${score}.`;
+      modeEl.textContent = victory ? "Victory" : "Critical";
+      modeEl.classList.toggle("value-danger", !victory);
+      clock.stop();
+    }
+
+    function revealWorld() {
+      if (worldUnlocked) return;
+      worldUnlocked = true;
+      puzzleSolved = true;
+      lockCore.visible = false;
+      for (const rune of stage3Runes) rune.visible = false;
+      for (const obj of revealables) {
+        obj.visible = true;
+      }
+      puzzleOverlay.classList.add("hidden");
+      hudWrap.classList.remove("ui-hidden-top");
+      controlsPanel.classList.remove("ui-hidden");
+      startOverlay.style.display = "flex";
+      modeEl.textContent = "Unlocked";
+      modeEl.classList.remove("value-danger");
+      setTimeout(() => {
+        puzzleOverlay.style.display = "none";
+      }, 700);
+    }
+
+    function wrapPosition(vec) {
+      if (vec.x > worldSize) vec.x = -worldSize;
+      if (vec.x < -worldSize) vec.x = worldSize;
+      if (vec.z > worldSize) vec.z = -worldSize;
+      if (vec.z < -worldSize) vec.z = worldSize;
+    }
+
+    function updateScientistRunAnim(moveStrength, elapsed, boost, delta) {
+      const parts = scientist.userData.parts;
+      const runPower = Math.max(moveStrength, 0.06);
+      stride += runPower * (5 + boost * 1.7) * delta;
+      const swing = Math.sin(stride * 10) * 0.8 * runPower;
+      parts.leftArmPivot.rotation.x = swing;
+      parts.rightArmPivot.rotation.x = -swing;
+      parts.leftLegPivot.rotation.x = -swing * 1.15;
+      parts.rightLegPivot.rotation.x = swing * 1.15;
+      parts.goggles.rotation.z = Math.sin(elapsed * 2.4) * 0.05;
+      parts.satchel.rotation.z = Math.sin(elapsed * 5.5) * 0.2 * runPower;
+      pulseRing.rotation.z += 0.06 + runPower * 0.08;
+      pulseRing.material.opacity = 0.48 + sprintCharge * 0.38;
+    }
+
+    function applyMovement(delta, elapsed) {
+      const direction = new THREE.Vector3(0, 0, 0);
+      if (keys.has("arrowup") || keys.has("w")) direction.z -= 1;
+      if (keys.has("arrowdown") || keys.has("s")) direction.z += 1;
+      if (keys.has("arrowleft") || keys.has("a")) direction.x -= 1;
+      if (keys.has("arrowright") || keys.has("d")) direction.x += 1;
+      if (direction.lengthSq() > 0) direction.normalize();
+
+      const sprinting = (keys.has("shift") || keys.has("shiftleft")) && sprintCharge > 0.08;
+      const boost = sprinting ? 2.5 : 1;
+      const speed = (7.2 + Math.sin(elapsed * 6) * 0.45) * boost;
+      scientist.position.x += direction.x * speed * delta;
+      scientist.position.z += direction.z * speed * delta;
+      wrapPosition(scientist.position);
+
+      if (sprinting) sprintCharge = Math.max(0, sprintCharge - delta * 0.4);
+      else sprintCharge = Math.min(1, sprintCharge + delta * 0.18);
+
+      if (direction.lengthSq() > 0) {
+        scientist.rotation.y = Math.atan2(direction.x, direction.z);
+      }
+      const bob = 0.24 + Math.sin(elapsed * 13) * 0.03 + (sprinting ? 0.02 : 0);
+      scientist.position.y += (bob - scientist.position.y) * 0.2;
+      updateScientistRunAnim(direction.length(), elapsed, boost, delta);
+    }
+
+    function updateOrbs(delta, elapsed) {
+      for (const orb of orbs) {
+        orb.rotation.y += delta * orb.userData.spin;
+        orb.rotation.x += delta * 0.8;
+        orb.position.y = orb.userData.baseY + Math.sin(elapsed * 3 + orb.position.x * 0.7) * 0.2;
+        if (orb.position.distanceTo(scientist.position) < 1.05) {
+          score += 15;
+          orb.position.copy(randomPos());
+          orb.userData.baseY = orb.position.y;
+        }
+      }
+    }
+
+    function updateHunters(delta, elapsed) {
+      for (const hunter of hunters) {
+        tempVec.subVectors(scientist.position, hunter.position);
+        const distance = tempVec.length() + 0.0001;
+        tempVec.normalize();
+        const wobble = Math.sin(elapsed * 4 + hunter.userData.wobble) * 0.8;
+        hunter.position.x += (tempVec.x + wobble * 0.24) * hunter.userData.speed * delta;
+        hunter.position.z += (tempVec.z - wobble * 0.24) * hunter.userData.speed * delta;
+        hunter.position.y = 0.95 + Math.sin(elapsed * 7 + hunter.userData.wobble) * 0.2;
+        wrapPosition(hunter.position);
+        hunter.rotation.x += delta * 2.0;
+        hunter.rotation.y += delta * 1.4;
+
+        if (distance < 1.25) {
+          health -= 27 * delta;
+          document.body.style.filter = "saturate(1.65) hue-rotate(-28deg)";
+        }
+      }
+    }
+
+    function updatePulses(delta) {
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const pulse = pulses[i];
+        pulse.userData.radius += delta * 10;
+        pulse.userData.life -= delta * 1.45;
+        pulse.scale.setScalar(pulse.userData.radius);
+        pulse.material.opacity = Math.max(0, pulse.userData.life);
+
+        for (const hunter of hunters) {
+          const distance = hunter.position.distanceTo(pulse.position);
+          if (distance < pulse.userData.radius * 1.25 && distance > pulse.userData.radius * 0.55) {
+            const knock = new THREE.Vector3()
+              .subVectors(hunter.position, pulse.position)
+              .normalize()
+              .multiplyScalar(2.0);
+            hunter.position.add(knock);
+          }
+        }
+        if (pulse.userData.life <= 0) {
+          scene.remove(pulse);
+          pulse.geometry.dispose();
+          pulse.material.dispose();
+          pulses.splice(i, 1);
+        }
+      }
+    }
+
+    function updateEquationCloud(delta, elapsed) {
+      for (const sprite of equationSprites) {
+        sprite.position.x += sprite.userData.drift.x * delta;
+        sprite.position.y += Math.sin(elapsed + sprite.userData.phase) * 0.003;
+        sprite.position.z += sprite.userData.drift.z * delta;
+        if (sprite.position.x > worldSize * 1.35) sprite.position.x = -worldSize * 1.35;
+        if (sprite.position.x < -worldSize * 1.35) sprite.position.x = worldSize * 1.35;
+        if (sprite.position.z > worldSize * 1.35) sprite.position.z = -worldSize * 1.35;
+        if (sprite.position.z < -worldSize * 1.35) sprite.position.z = worldSize * 1.35;
+        sprite.material.opacity = 0.33 + Math.sin(elapsed * 1.2 + sprite.userData.phase) * 0.2;
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta() || 0.016, 0.04);
+      const elapsed = clock.elapsedTime;
+
+      lockCore.rotation.y += 0.012;
+      lockCore.rotation.x = Math.sin(elapsed * 0.7) * 0.16;
+      lockCore.position.y = 1.8 + Math.sin(elapsed * 1.8) * 0.2;
+      stage3Phase += delta * 1.9;
+      if (!worldUnlocked && puzzleStage === 3) {
+        lockHalo.material.emissiveIntensity = 0.8 + Math.sin(stage3Phase * 2.2) * 0.55;
+        lockHalo.scale.setScalar(1.06 + Math.sin(stage3Phase * 2.2) * 0.12);
+      } else {
+        lockHalo.material.emissiveIntensity = 1.1;
+        lockHalo.scale.setScalar(1 + Math.sin(elapsed * 4) * 0.08);
+      }
+
+      if (!worldUnlocked && puzzleStage === 3) {
+        for (let i = 0; i < stage3Runes.length; i++) {
+          const rune = stage3Runes[i];
+          const angle = stage3Phase + (Math.PI * 2 * i) / stage3Runes.length;
+          rune.position.set(Math.cos(angle) * 2.2, 1.8 + Math.sin(stage3Phase * 2.6 + i) * 0.4, Math.sin(angle) * 2.2);
+          rune.rotation.x += 0.018;
+          rune.rotation.y += 0.03;
+          rune.material.emissiveIntensity = 0.45 + (i === 0 ? (Math.sin(stage3Phase * 2.2) + 1) * 0.7 : 0.2);
+        }
+      }
+
+      if (worldUnlocked) {
+        stars.rotation.y += 0.0002;
+        stars.rotation.x = Math.sin(elapsed * 0.08) * 0.06;
+        grid.material.opacity = 0.24 + Math.sin(elapsed * 3.1) * 0.12;
+        grid.material.transparent = true;
+        floor.material.map.offset.x = elapsed * 0.004;
+        floor.material.map.offset.y = Math.sin(elapsed * 0.23) * 0.03;
+        updateEquationCloud(delta, elapsed);
+      }
+
+      if (isRunning) {
+        gameTime -= delta;
+        applyMovement(delta, elapsed);
+        updateOrbs(delta, elapsed);
+        updateHunters(delta, elapsed);
+        updatePulses(delta);
+        updateHud();
+
+        const camTarget = new THREE.Vector3(scientist.position.x, 7.5, scientist.position.z + 9.7);
+        camera.position.lerp(camTarget, 0.06);
+        camera.lookAt(scientist.position.x, 1.3, scientist.position.z);
+
+        if (health <= 0) endGame(false);
+        if (gameTime <= 0) endGame(true);
+      }
+
+      if (!worldUnlocked) {
+        document.body.style.filter = "none";
+      } else {
+        document.body.style.filter = "none";
+      }
+      renderer.render(scene, camera);
+    }
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }
+
+    window.addEventListener("resize", onResize);
+    function normalizedPointer(event) {
+      return {
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -((event.clientY / window.innerHeight) * 2 - 1)
+      };
+    }
+
+    window.addEventListener("pointerdown", (event) => {
+      if (puzzleSolved || puzzleStage !== 1) return;
+      dragging = true;
+      const p = normalizedPointer(event);
+      lastAngle = Math.atan2(p.y, p.x);
+      angleTravel = 0;
+      validSamples = 0;
+    });
+
+    window.addEventListener("pointermove", (event) => {
+      if (!dragging || puzzleSolved || puzzleStage !== 1) return;
+      const p = normalizedPointer(event);
+      const radius = Math.hypot(p.x, p.y);
+      if (radius < 0.16 || radius > 0.9) return;
+
+      const angle = Math.atan2(p.y, p.x);
+      if (lastAngle != null) {
+        let deltaA = angle - lastAngle;
+        if (deltaA > Math.PI) deltaA -= Math.PI * 2;
+        if (deltaA < -Math.PI) deltaA += Math.PI * 2;
+        if (Math.abs(deltaA) < 0.9) {
+          angleTravel += deltaA;
+          validSamples += 1;
+        }
+      }
+      lastAngle = angle;
+
+      if (Math.abs(angleTravel) > Math.PI * 1.82 && validSamples > 18) {
+        setPuzzleStage(2);
+      }
+    });
+
+    window.addEventListener("pointerup", () => {
+      dragging = false;
+      lastAngle = null;
+      if (!puzzleSolved && puzzleStage === 1) {
+        angleTravel *= 0.4;
+        validSamples = Math.max(0, validSamples - 5);
+      }
+    });
+
+    function puzzleCanvasPoint(event) {
+      const rect = puzzle2d.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * puzzle2d.width;
+      const y = ((event.clientY - rect.top) / rect.height) * puzzle2d.height;
+      return { x, y };
+    }
+
+    puzzle2d.addEventListener("pointerdown", (event) => {
+      if (!stage2Active || puzzleSolved || puzzleStage !== 2) return;
+      stage2Dragging = true;
+      puzzle2d.setPointerCapture(event.pointerId);
+      drawStage2Puzzle(puzzleCanvasPoint(event));
+    });
+
+    puzzle2d.addEventListener("pointermove", (event) => {
+      if (!stage2Active || !stage2Dragging || puzzleSolved || puzzleStage !== 2) return;
+      const p = puzzleCanvasPoint(event);
+      const target = stage2Nodes[stage2Current];
+      const tx = target.x * puzzle2d.width;
+      const ty = target.y * puzzle2d.height;
+      const dist = Math.hypot(p.x - tx, p.y - ty);
+
+      if (dist < 24) {
+        stage2Current += 1;
+        if (stage2Current >= stage2Nodes.length) {
+          completeStage2();
+          return;
+        }
+      } else {
+        const prev = stage2Current > 0 ? stage2Nodes[stage2Current - 1] : stage2Nodes[0];
+        const px = prev.x * puzzle2d.width;
+        const py = prev.y * puzzle2d.height;
+        if (Math.hypot(p.x - px, p.y - py) > 120) {
+          stage2Current = 0;
+        }
+      }
+      drawStage2Puzzle(p);
+    });
+
+    puzzle2d.addEventListener("pointerup", () => {
+      stage2Dragging = false;
+      if (stage2Active) drawStage2Puzzle();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      keys.add(key);
+      if (key === " " && isRunning) createPulse();
+      if (!worldUnlocked && puzzleStage === 3 && key === " ") {
+        const resonance = Math.sin(stage3Phase * 2.2);
+        if (resonance > 0.94) {
+          stage3Hits += 1;
+          puzzleHint.textContent = "";
+          if (stage3Hits >= 3) {
+            revealWorld();
+          }
+        } else {
+          stage3Hits = Math.max(0, stage3Hits - 1);
+        }
+      }
+      if (key === "r" && worldUnlocked) startGame();
+    });
+    window.addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
+
+    startBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", startGame);
+
+    setPuzzleStage(1);
+    animate();
+  </script>
+</body>
+</html>

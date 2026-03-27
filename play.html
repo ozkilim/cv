@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oz Kilim | Interactive CV Room</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="bg"></canvas>
+
+    <div id="cv-intro-overlay" class="overlay visible">
+      <div class="cv-intro-card">
+        <p class="cv-kicker">resume.html</p>
+        <h1>Oz Kilim</h1>
+        <p class="cv-sub">Postdoctoral Research Fellow</p>
+        <p class="cv-summary">CHIP, Boston Children's Hospital, Harvard Medical School</p>
+        <p class="cv-summary">CTO (Stealth)</p>
+        <hr />
+        <p class="cv-plain-line"><strong>Education:</strong> Master's (Oxford), PhD (ELTE)</p>
+        <p class="cv-plain-line"><strong>Location:</strong> Boston</p>
+        <p class="cv-plain-line"><strong>Email:</strong> ozsamkilim@gmail.com</p>
+        <p class="cv-plain-line"><strong>Website:</strong> ozkilim.github.io</p>
+        <div class="cv-actions">
+          <button id="cv-enter-btn" class="cv-primary">More Info</button>
+          <p class="cv-hint">Click for more information.</p>
+        </div>
+      </div>
+      <div id="cv-black-fade" aria-hidden="true"></div>
+    </div>
+
+    <div id="poem-overlay" class="overlay">
+      <div id="poem-card">
+        <p class="poem-line">いつも 来る のに</p>
+        <p class="poem-line">決して 届かない もの は？</p>
+        <p class="poem-line poem-final">
+          それは
+          <span class="inline-input-wrap">
+            <input id="poem-input" autocomplete="off" spellcheck="false" />
+          </span>
+        </p>
+      </div>
+    </div>
+    <div id="sparkle-burst" aria-hidden="true"></div>
+
+    <div id="hud" class="hidden-ui">
+      <div class="hud-left">
+        <p class="hud-label">Focused Object</p>
+        <p id="focus-name">None</p>
+      </div>
+      <div class="hud-right">
+        <p id="room-name">Room: CV Gallery</p>
+        <p id="objective">Explore objects to read sections of my CV.</p>
+      </div>
+    </div>
+
+    <div id="crosshair" class="hidden-ui"></div>
+    <div id="interaction-tip">Press Enter to inspect</div>
+    <div id="transit-hint" class="hidden-ui">
+      Drive with Arrow keys toward the glowing gate.
+    </div>
+
+    <div id="content-panel" class="panel hidden">
+      <button id="close-panel" aria-label="Close panel">X</button>
+      <div id="panel-body"></div>
+    </div>
+
+    <div id="viewer-panel" class="panel hidden viewer-panel">
+      <button id="close-viewer-panel" aria-label="Close viewer">X</button>
+      <button id="minify-viewer-panel" aria-label="Minimize viewer">-</button>
+      <button id="expand-viewer-panel" aria-label="Expand viewer">+</button>
+      <div class="viewer-header">
+        <h2 id="viewer-title">Pathology Viewer</h2>
+        <a id="viewer-open-new-tab" href="#" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+      </div>
+      <iframe
+        id="viewer-iframe"
+        title="Embedded pathology slide viewer"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+      ></iframe>
+    </div>
+
+    <!-- Progress HUD -->
+    <div id="progress-hud" class="gone">
+      <svg width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(87,230,255,0.15)" stroke-width="3"/>
+        <circle id="progress-ring-fill" cx="25" cy="25" r="20" fill="none" stroke="#57e6ff"
+                stroke-width="3" stroke-linecap="round" transform="rotate(-90 25 25)"/>
+      </svg>
+      <span id="progress-text">0 / 0</span>
+    </div>
+
+    <!-- Minimap -->
+    <canvas id="minimap-canvas" class="gone" width="140" height="140"></canvas>
+
+    <!-- Controls overlay -->
+    <div id="controls-overlay" class="gone">
+      <div class="controls-grid">
+        <div class="ctrl-row">
+          <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+          <span class="ctrl-desc">Move</span>
+        </div>
+        <div class="ctrl-row">
+          <kbd>Mouse</kbd>
+          <span class="ctrl-desc">Look around</span>
+        </div>
+        <div class="ctrl-row">
+          <kbd>Space</kbd>
+          <span class="ctrl-desc">Jump (double-jump!)</span>
+        </div>
+        <div class="ctrl-row">
+          <kbd>Enter</kbd> / <kbd>Click</kbd>
+          <span class="ctrl-desc">Interact with object</span>
+        </div>
+        <div class="ctrl-row">
+          <kbd>Esc</kbd>
+          <span class="ctrl-desc">Close panel</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guestbook panel -->
+    <div id="guestbook-panel" class="panel hidden">
+      <button id="close-guestbook" aria-label="Close guestbook">X</button>
+      <h2 class="gb-title">Guestbook</h2>
+      <p class="gb-subtitle">Leave a mark. Others will see it too.</p>
+      <div id="gb-messages"></div>
+      <div class="gb-form">
+        <input id="gb-name" placeholder="Your name" maxlength="40" />
+        <textarea id="gb-text" placeholder="Write something..." rows="2" maxlength="280"></textarea>
+        <button id="gb-submit">Post</button>
+      </div>
+    </div>
+
+    <!-- Puzzle overlay -->
+    <div id="puzzle-overlay" class="panel hidden puzzle-fullscreen">
+      <button id="puzzle-close" aria-label="Close puzzle">X</button>
+      <h2 class="puzzle-heading">Unknotting Puzzle</h2>
+      <p class="puzzle-desc">Drag nodes to remove all edge crossings.</p>
+      <canvas id="puzzle-canvas"></canvas>
+    </div>
+
+    <!-- Share card overlay -->
+    <div id="share-overlay" class="panel hidden share-fullscreen">
+      <button id="share-close" aria-label="Close">X</button>
+      <h2 class="share-heading">You discovered everything!</h2>
+      <canvas id="share-canvas"></canvas>
+      <div class="share-actions">
+        <button id="share-download">Download Card</button>
+        <button id="share-x-btn">Share on X</button>
+        <button id="share-challenge">Challenge a Friend</button>
+      </div>
+    </div>
+
+    <!-- QR code overlay -->
+    <div id="qr-overlay" class="panel hidden qr-fullscreen">
+      <button id="qr-close" aria-label="Close">X</button>
+      <h2 class="qr-heading">Scan to Enter</h2>
+      <p class="qr-desc">Point a phone camera at this code</p>
+      <canvas id="qr-canvas" width="250" height="250"></canvas>
+      <p class="qr-url" id="qr-url-text"></p>
+    </div>
+
+    <!-- Photo mode overlay -->
+    <div id="photo-overlay" class="panel hidden photo-fullscreen">
+      <button id="photo-close" aria-label="Close">X</button>
+      <h2 class="photo-heading">Photo Booth</h2>
+      <canvas id="photo-canvas"></canvas>
+      <div class="share-actions">
+        <button id="photo-download">Download</button>
+        <button id="photo-share-x">Share on X</button>
+      </div>
+    </div>
+
+    <!-- Theme picker -->
+    <div id="theme-picker" class="gone">
+      <span class="theme-picker-label">Themes</span>
+      <div id="theme-options"></div>
+    </div>
+
+    <!-- Speedrun timer -->
+    <div id="speedrun-hud" class="gone">
+      <span id="speedrun-time">0:00</span>
+    </div>
+
+    <div id="toast"></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
